@@ -1,0 +1,86 @@
+#include <LiquidCrystal.h>
+
+int LedRojo=8;
+int FotoRe = A0;
+int sensorTemp = A1;
+int sensorHum = A2;
+int motor1=12;
+int motor2=13;
+
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+
+void setup()
+{
+  	pinMode(LedRojo,OUTPUT);
+  	pinMode(motor1, OUTPUT);
+  	pinMode(motor2, OUTPUT);
+  	lcd.begin(16,2);
+  	Serial.begin(9600);
+}
+
+void loop()
+{
+ 	int valorLuz = analogRead(FotoRe);
+  
+	if(valorLuz >= 0 && valorLuz <= 512)
+	{
+  		digitalWrite(LedRojo,HIGH);
+	}
+	else
+	{
+ 		digitalWrite(LedRojo,LOW);
+	}
+	delay(1000);
+  
+  	
+  	float temperatura = analogRead(sensorTemp);
+  	temperatura = (((5 * temperatura * 100) / 1024) - 50);
+	
+  	if(temperatura <= 30)
+  	{ 
+  		digitalWrite(motor1, LOW);
+      	lcd.setCursor(1,0);
+      	lcd.print("Temp baja: ");
+      	lcd.print(temperatura);
+      	lcd.print("C");
+      	lcd.print(" / Ventilador APAGADO");
+      	lcd.scrollDisplayLeft();
+  	}
+  	else
+  	{ 
+      	digitalWrite(motor1, HIGH);
+      	lcd.setCursor(1,0);
+      	lcd.print("Temp alta: ");
+      	lcd.print(temperatura);
+      	lcd.print("C");
+      	lcd.print(" / Ventilador ENCENDIDO");
+ 		lcd.scrollDisplayLeft();
+  	}
+  	
+  	
+    int	humedad = analogRead(A2);
+  	humedad = map(humedad, 0, 1023, 0, 100);
+	
+  	if(humedad<80)
+  	{ 
+		digitalWrite(motor2,HIGH);
+      	lcd.setCursor(1,1);
+      	lcd.print("Suelo seco / ");
+      	lcd.print("HUM: ");
+      	lcd.print(humedad);
+      	lcd.print("%");
+      	lcd.print(" / Riego APAGADO");
+      	
+  	}
+  	else
+  	{
+  		digitalWrite(motor2,LOW);
+      	lcd.setCursor(1,1);
+      	lcd.print("Suelo humedo / ");
+      	lcd.print("HUM: ");
+      	lcd.print(humedad);
+      	lcd.print("%");
+      	lcd.print(" / Riego ENCENDIDO");
+  	}
+  
+}
